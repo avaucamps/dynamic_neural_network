@@ -43,10 +43,13 @@ def get_labels_vector(labels):
 
 
 def prepare_dataset(images_train, labels_train, images_test, labels_test):
-    X_train = np.asarray(images_train).reshape([len(labels_train), image_size, image_size])
-    X_test = np.asarray(images_test).reshape([len(labels_test), image_size, image_size])
+    X_train = np.asarray(images_train).reshape([len(labels_train), image_size * image_size])
+    X_test = np.asarray(images_test).reshape([len(labels_test), image_size * image_size])
 
     y_train = get_labels_vector(labels_train)
     y_test = get_labels_vector(labels_test)
+
+    X_train = X_train / 255
+    X_test = X_test / 255
 
     return X_train, y_train, X_test, y_test
