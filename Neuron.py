@@ -16,6 +16,10 @@ class Neuron:
                              upp=rad)
         self.weights = np.array(X.rvs((1, input_shape)))
 
+    
+    def get_n_parameters(self):
+        return self.weights.shape[1]
+
 
     def get_weights(self):
         return self.weights
