@@ -5,7 +5,7 @@ from HiddenLayer import HiddenLayer
 from OutputLayer import OutputLayer
 
 class NeuralNetwork:
-    def __init__(self, input_shape, hidden_shape, output_shape, learning_rate):
+    def __init__(self, input_shape, hidden_shape, output_shape, learning_rate, is_agent_mode_enabled = False):
         """
         Init and builds a fully-connected neural network.
 
@@ -14,17 +14,18 @@ class NeuralNetwork:
             - hidden_shape: array with number of neurons for each hidden layer, [int, int ...].
             - output_shape: number of neurons in output layer.
             - learning_rate: learning rate used for optimization.
+            - is_agent_mode_enabled: whether or not the neurons should be agents in the hidden layer(s).
         """
-        self.build_model(input_shape, hidden_shape, output_shape, learning_rate)
+        self.build_model(input_shape, hidden_shape, output_shape, learning_rate, is_agent_mode_enabled)
 
 
-    def build_model(self, input_shape, hidden_shape, output_shape, learning_rate):
-        self.input_layer = InputLayer(input_shape)
+    def build_model(self, input_shape, hidden_shape, output_shape, learning_rate, is_agent_mode_enabled):
+        self.input_layer = InputLayer()
         self.hidden_layers = []
 
         last_output_shape = input_shape
         for shape in hidden_shape:
-            self.hidden_layers.append(HiddenLayer(shape, last_output_shape, sigmoid, learning_rate))
+            self.hidden_layers.append(HiddenLayer(shape, last_output_shape, sigmoid, learning_rate, is_agent_mode_enabled))
             last_output_shape = shape
 
         last_layer_output_shape = self.hidden_layers[-1].get_output_shape()

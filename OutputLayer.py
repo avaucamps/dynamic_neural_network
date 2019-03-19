@@ -5,15 +5,8 @@ from utils import truncated_normal
 class OutputLayer:
     def __init__(self, n_neurons, input_shape, activation_function, learning_rate):
         self.activation_function = activation_function
-        self.setup_neurons(n_neurons, activation_function)
         self.setup_weights(n_neurons, input_shape)
         self.learning_rate = learning_rate
-
-
-    def setup_neurons(self, n_neurons, activation_function):
-        self.neurons = np.empty([n_neurons, 1], dtype=object)
-        for i in range(n_neurons):
-            self.neurons[i] = Neuron(activation_function)
 
     
     def setup_weights(self, n_neurons, input_shape):
