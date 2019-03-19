@@ -16,12 +16,13 @@ ANN = NeuralNetwork(
         learning_rate = 0.1,
         is_agent_mode_enabled = True
 )
-ANN.train(X_train, y_train)
-errors = 0
-for i in range(X_test.shape[0]):
-    res = ANN.test(X_test[i])
-    if np.argmax(res) != np.argmax(np.array(y_test[i])):
-        errors += 1
+ANN.print_n_parameters()
+#ANN.train(X_train, y_train)
+# errors = 0
+# for i in range(X_test.shape[0]):
+#     res = ANN.test(X_test[i])
+#     if np.argmax(res) != np.argmax(np.array(y_test[i])):
+#         errors += 1
 
-accuracy = 1 - (errors / len(y_test))
-print(accuracy)
+# accuracy = 1 - (errors / len(y_test))
+# print(accuracy)
