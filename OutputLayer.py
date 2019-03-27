@@ -15,6 +15,10 @@ class OutputLayer:
         self.weights = np.array(X.rvs((n_neurons, input_shape)))
 
     
+    def get_n_parameters(self):
+        return self.weights.shape[0] * self.weights.shape[1]
+
+    
     def execute_forward_pass(self, inputs):
         self.output = self.activation_function(np.dot(self.weights, inputs))
         return self.output

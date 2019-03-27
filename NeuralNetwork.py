@@ -64,3 +64,12 @@ class FullyConnectedNeuralNetwork:
 
     def test(self, input_vector):
         return self.execute_forward_propagation(input_vector)
+
+
+    def print_n_parameters(self):
+        n_parameters = self.output_layer.get_n_parameters()
+
+        for layer in self.hidden_layers:
+            n_parameters += layer.get_n_parameters()
+
+        print("{} parameters.".format(str(n_parameters)))
