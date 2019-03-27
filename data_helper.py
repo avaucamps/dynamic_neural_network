@@ -9,9 +9,12 @@ BASE_PATH = os.path.dirname(os.path.realpath(__file__))
 DATA_PATH = MNIST(os.path.join(BASE_PATH, 'data'))
 
 
-def get_data():
+def get_data(reshape = False):
     """
     Retrieves MNIST data and parses it as numpy arrays.
+
+    Arguments:
+        - reshape: if true, reshape the data to 1D array.
 
     Returns:
         - X_train: numpy array of shape (number of images, image_size, image_size) with training images.
@@ -20,7 +23,7 @@ def get_data():
         - y_test: numpy array of shape (number of labels) with test labels.
     """
     images_train, labels_train, images_test, labels_test = load_dataset()
-    X_train, y_train, X_test, y_test = prepare_dataset(images_train, labels_train, images_test, labels_test)
+    X_train, y_train, X_test, y_test = prepare_dataset(images_train, labels_train, images_test, labels_test, reshape)
 
     return X_train, y_train, X_test, y_test
 
@@ -42,9 +45,13 @@ def get_labels_vector(labels):
     return y
 
 
-def prepare_dataset(images_train, labels_train, images_test, labels_test):
-    X_train = np.asarray(images_train).reshape([len(labels_train), image_size * image_size])
-    X_test = np.asarray(images_test).reshape([len(labels_test), image_size * image_size])
+def prepare_dataset(images_train, labels_train, images_test, labels_test, reshape):
+    if reshape:
+        X_train = np.asarray(images_train).reshape([len(labels_train), image_size * image_size])
+        X_test = np.asarray(images_test).reshape([len(labels_test), image_size * image_size])
+    else:
+        X_train = np.asarray(images_train).reshape([len(labels_train), image_size, image_size])
+        X_test = np.asarray(images_test).reshape([len(labels_test), image_size, image_size])
 
     y_train = get_labels_vector(labels_train)
     y_test = get_labels_vector(labels_test)

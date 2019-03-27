@@ -39,3 +39,13 @@ def relu_derivative(x):
 
 def mean_squared_error_derivative(outputs, targets):
     return -(targets - outputs)
+
+
+def get_categorical_crossentropy_loss(predictions, desired_predictions):
+    return -np.sum(desired_predictions * np.log(predictions))
+
+
+def index_nan_argmax(array):
+    idx = np.nanargmax(array)
+    idxs = np.unravel_index(idx, array.shape)
+    return idxs 

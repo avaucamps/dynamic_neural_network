@@ -3,8 +3,9 @@ import numpy as np
 from InputLayer import InputLayer
 from HiddenLayer import HiddenLayer
 from OutputLayer import OutputLayer
+from tqdm import tqdm
 
-class NeuralNetwork:
+class FullyConnectedNeuralNetwork:
     def __init__(self, input_shape, hidden_shape, output_shape, learning_rate, is_agent_mode_enabled = False):
         """
         Init and builds a fully-connected neural network.
@@ -33,7 +34,7 @@ class NeuralNetwork:
 
 
     def train(self, inputs, outputs):
-        for i in range(inputs.shape[0]):
+        for i in tqdm(range(inputs.shape[0])):
             input_sample = inputs[i].reshape([inputs[i].shape[0], 1])
             expected_output = outputs[i].reshape([outputs[i].shape[0], 1])
             forward_pass_output = self.execute_forward_propagation(input_sample)
