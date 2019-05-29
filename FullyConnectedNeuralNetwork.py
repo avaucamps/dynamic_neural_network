@@ -1,10 +1,10 @@
 from utils.utils import sigmoid, relu, relu_derivative, truncated_normal, mean_squared_error_derivative
 import numpy as np
-from InputLayer import InputLayer
-from HiddenLayer import HiddenLayer
-from OutputLayer import OutputLayer
+from layers.InputLayer import InputLayer
+from layers.HiddenLayer import HiddenLayer
+from layers.OutputLayer import OutputLayer
 from tqdm import tqdm
-from Interface import Interface
+from GUI.Interface import Interface
 import threading
 
 

@@ -1,7 +1,7 @@
 import numpy as np
 from data_helper import get_data
 from utils.utils import show_digit
-from NeuralNetwork import FullyConnectedNeuralNetwork
+from FullyConnectedNeuralNetwork import FullyConnectedNeuralNetwork
 from CNN import CNN
 from tqdm import tqdm
 
@@ -25,7 +25,7 @@ def run_mnist_feedforward_network(hidden_shape, learning_rate, is_agent_mode_ena
         )
 
         print("Epoch 1...")
-        model.train(X_train, y_train)
+        model.train_mnist(X_train, y_train)
         test_mnist_network(model, X_test, y_test)
 
 

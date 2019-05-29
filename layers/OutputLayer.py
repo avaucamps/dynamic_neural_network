@@ -1,5 +1,4 @@
-import numpy as np 
-from Neuron import Neuron
+import numpy as np
 from utils.utils import truncated_normal
 
 class OutputLayer:

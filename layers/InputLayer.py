@@ -1,5 +1,4 @@
-import numpy as np 
-from Neuron import Neuron
+import numpy as np
 
 class InputLayer:
     def execute_forward_pass(self, input_vector):

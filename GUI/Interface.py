@@ -1,6 +1,6 @@
 import tkinter as tk 
-from utils.nn_std_representation_helper import draw_network_standard_representation
-from utils.nn_agent_representation_helper import draw_network_agent_representation
+from .nn_std_representation_helper import draw_network_standard_representation
+from .nn_agent_representation_helper import draw_network_agent_representation
 
 
 class Interface:

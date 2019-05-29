@@ -1,5 +1,5 @@
 import numpy as np
-from Neuron import Neuron
+from .Neuron import Neuron
 from utils.utils import truncated_normal
 
 class HiddenLayer:

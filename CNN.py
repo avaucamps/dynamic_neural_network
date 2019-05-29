@@ -1,9 +1,9 @@
 import numpy as np
-from HiddenLayer import HiddenLayer
-from OutputLayer import OutputLayer
-from ConvolutionLayer import ConvolutionLayer
-from MaxPoolLayer import MaxPoolLayer
-from FlattenLayer import FlattenLayer
+from layers.HiddenLayer import HiddenLayer
+from layers.OutputLayer import OutputLayer
+from layers.ConvolutionLayer import ConvolutionLayer
+from layers.MaxPoolLayer import MaxPoolLayer
+from layers.FlattenLayer import FlattenLayer
 from utils.utils import relu, sigmoid, mean_squared_error_derivative, show_digit
 from tqdm import tqdm
 
