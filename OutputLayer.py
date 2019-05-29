@@ -1,6 +1,6 @@
 import numpy as np 
 from Neuron import Neuron
-from utils import truncated_normal
+from utils.utils import truncated_normal
 
 class OutputLayer:
     def __init__(self, n_neurons, input_shape, activation_function, learning_rate):

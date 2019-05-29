@@ -1,5 +1,5 @@
 import numpy as np 
-from utils import truncated_normal
+from utils.utils import truncated_normal
 
 class Neuron:
     def __init__(self, input_shape, activation_function = None):

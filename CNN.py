@@ -4,7 +4,7 @@ from OutputLayer import OutputLayer
 from ConvolutionLayer import ConvolutionLayer
 from MaxPoolLayer import MaxPoolLayer
 from FlattenLayer import FlattenLayer
-from utils import relu, sigmoid, mean_squared_error_derivative, show_digit
+from utils.utils import relu, sigmoid, mean_squared_error_derivative, show_digit
 from tqdm import tqdm
 
 class CNN:

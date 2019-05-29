@@ -1,5 +1,5 @@
 import numpy as np
-from utils import index_nan_argmax
+from utils.utils import index_nan_argmax
 
 class MaxPoolLayer:
     def __init__(self, window_size, stride=1):

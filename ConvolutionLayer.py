@@ -1,5 +1,5 @@
 import numpy as np 
-from utils import relu, relu_derivative
+from utils.utils import relu, relu_derivative
 
 class ConvolutionLayer:
     def __init__(self, n_filters, filter_size, learning_rate, stride=1):
