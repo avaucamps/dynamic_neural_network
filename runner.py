@@ -4,6 +4,8 @@ from utils.utils import show_digit
 from FullyConnectedNeuralNetwork import FullyConnectedNeuralNetwork
 from CNN import CNN
 from tqdm import tqdm
+from GUI.Interface import Interface
+from queue import Queue
 
 np.random.seed(0)
 
@@ -16,7 +18,9 @@ def run_mnist_feedforward_network(hidden_shape, learning_rate, is_agent_mode_ena
         particular behavior to neuron.
         """
         X_train, y_train, X_test, y_test = get_data(reshape=True)
+        queue = Queue()
         model = FullyConnectedNeuralNetwork(
+                queue = queue,
                 input_shape = 784, 
                 hidden_shape = hidden_shape, 
                 output_shape = 10,
@@ -25,48 +29,28 @@ def run_mnist_feedforward_network(hidden_shape, learning_rate, is_agent_mode_ena
         )
 
         print("Epoch 1...")
-        model.train_mnist(X_train, y_train)
+        model.set_data(X_train, y_train, 1, "mnist")
+        model.start()
         test_mnist_network(model, X_test, y_test)
-
-
-def run_cnn(learning_rate, batch_size):
-        """
-        Args:
-        - learning_rate: learning rate used to train the network.
-        - batch_size: batch_size to train the network.
-        """
-        X_train, y_train, X_test, y_test = get_data()
-        model = CNN(n_classes=10, learning_rate=learning_rate, batch_size=batch_size)
-        print("Epoch 1...")
-        model.train(X_train[:50], y_train[:50])
-        test_mnist_network(model, X_test[:5], y_test[:5])
-
-
-def test_network(model, X_test, y_test):
-        errors = 0
-        print("Testing...")
-        for i in tqdm(range(X_test.shape[0])):
-                res = model.test(X_test[i])
-                if np.argmax(res) != np.argmax(np.array(y_test[i])):
-                        errors += 1
-
-        accuracy = 1 - (errors / len(y_test))
-        print("Accuracy is {}".format(accuracy))
 
 
 def run_xor_feedforward_network(is_agent_mode_enabled = False):
         X_train = np.array([[0, 1], [1, 0], [1, 1], [0, 0]])
         y_train = np.array([[1], [1], [0], [0]])
+        queue = Queue()
+        interface = Interface(queue)
 
         model = FullyConnectedNeuralNetwork(
+                queue = queue,
                 input_shape = 2, 
                 hidden_shape = [1,2,3,4,5,6,7,9], 
                 output_shape = 1, 
                 learning_rate = 0.1,
                 is_agent_mode_enabled = is_agent_mode_enabled
         )
-
-        model.train_xor(X_train, y_train, 1)
+        model.set_data(X_train, y_train, 1000, "xor")
+        model.start()
+        interface.run()
         test_xor_network(model, X_train, y_train)
 
 
@@ -88,6 +72,31 @@ def test_xor_network(model, X_test, y_test):
         for i in tqdm(range(X_test.shape[0])):
                 res = model.test(X_test[i])
                 errors += abs(res - y_test[i])
+
+        accuracy = 1 - (errors / len(y_test))
+        print("Accuracy is {}".format(accuracy))
+
+
+def run_cnn(learning_rate, batch_size):
+        """
+        Args:
+        - learning_rate: learning rate used to train the network.
+        - batch_size: batch_size to train the network.
+        """
+        X_train, y_train, X_test, y_test = get_data()
+        model = CNN(n_classes=10, learning_rate=learning_rate, batch_size=batch_size)
+        print("Epoch 1...")
+        model.train(X_train[:50], y_train[:50])
+        test_cnn_network(model, X_test[:5], y_test[:5])
+
+
+def test_cnn_network(model, X_test, y_test):
+        errors = 0
+        print("Testing...")
+        for i in tqdm(range(X_test.shape[0])):
+                res = model.test(X_test[i])
+                if np.argmax(res) != np.argmax(np.array(y_test[i])):
+                        errors += 1
 
         accuracy = 1 - (errors / len(y_test))
         print("Accuracy is {}".format(accuracy))

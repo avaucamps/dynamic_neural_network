@@ -1,16 +1,22 @@
-import tkinter as tk 
-from .nn_std_representation_helper import draw_network_standard_representation
-from .nn_agent_representation_helper import draw_network_agent_representation
+import tkinter as tk
+import types
+from queue import Queue
+from .StdRepresentationHelper import StdRepresentationHelper
+from .AgentRepresentationHelper import AgentRepresentationHelper
 
 
-class Interface:
-    def __init__(self):
+class Interface():
+    def __init__(self, queue):
+        self.queue = queue
         self.window = tk.Tk()
         self.window.wm_title("Neural network dynamic organisation")
         self._setup_canvas()
+        self.std_representation_helper = StdRepresentationHelper(self.canvas)
+        self.agent_representation_helper = AgentRepresentationHelper(self.canvas)
 
 
-    def start(self):
+    def run(self):
+        self.window.after(100, self._update)
         self.window.mainloop()
 
 
@@ -32,10 +38,27 @@ class Interface:
         self.canvas.create_oval(955, 105, 965, 115, fill="#BBB")
 
 
-    def draw_network_std_representation(self, hidden_shape):
-        self.canvas = draw_network_standard_representation(self.canvas, hidden_shape, self.std_representation_width)
+    def _draw_network_std_representation(self, hidden_shape):
+        self.std_representation_helper.draw_network_standard_representation(
+            hidden_shape=hidden_shape, 
+            container_width=self.std_representation_width
+        )
 
 
-    def draw_network_agent_representation(self, hidden_shape):
+    def _draw_network_agent_representation(self, hidden_shape):
         x_center = 1300
-        self.canvas = draw_network_agent_representation(self.canvas, hidden_shape, x_center, self.height)
+        self.agent_representation_helper.draw_network_agent_representation(
+            hidden_shape=hidden_shape, 
+            x_center=x_center, 
+            height=self.height
+        )
+
+
+    def _update(self):
+        hidden_shape = self.queue.get()
+        if hidden_shape and isinstance(hidden_shape, list):
+            self._draw_network_std_representation(hidden_shape)
+            self._draw_network_agent_representation(hidden_shape)
+
+        self.canvas.update()
+        self.window.after(100, self._update)
