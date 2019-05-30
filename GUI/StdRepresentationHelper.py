@@ -9,7 +9,7 @@ class StdRepresentationHelper:
         self.removable_tag = "removable"
 
 
-    def draw_network_standard_representation(self, hidden_shape, container_width):
+    def draw_representation(self, hidden_shape, container_width):
         """
         Draws a neural network standard representation in the canvas passed in parameters.
 

@@ -10,7 +10,7 @@ class AgentRepresentationHelper:
         self.removable_tag = "removable"
 
 
-    def draw_network_agent_representation(self, hidden_shape, x_center, height):
+    def draw_representation(self, hidden_shape, x_center, height):
         """
         Draws the neural network in the canvas passed in parameter.
 

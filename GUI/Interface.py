@@ -39,7 +39,7 @@ class Interface():
 
 
     def _draw_network_std_representation(self, hidden_shape):
-        self.std_representation_helper.draw_network_standard_representation(
+        self.std_representation_helper.draw_representation(
             hidden_shape=hidden_shape, 
             container_width=self.std_representation_width
         )
@@ -47,7 +47,7 @@ class Interface():
 
     def _draw_network_agent_representation(self, hidden_shape):
         x_center = 1300
-        self.agent_representation_helper.draw_network_agent_representation(
+        self.agent_representation_helper.draw_representation(
             hidden_shape=hidden_shape, 
             x_center=x_center, 
             height=self.height
@@ -55,10 +55,13 @@ class Interface():
 
 
     def _update(self):
-        hidden_shape = self.queue.get()
-        if hidden_shape and isinstance(hidden_shape, list):
-            self._draw_network_std_representation(hidden_shape)
-            self._draw_network_agent_representation(hidden_shape)
+        message = self.queue.get()
+        if message:
+            if isinstance(message, list):
+                self._draw_network_std_representation(message)
+                self._draw_network_agent_representation(message)
+            elif isinstance(message, str) and message == "Done":
+                return
 
         self.canvas.update()
         self.window.after(100, self._update)

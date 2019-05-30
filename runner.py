@@ -48,9 +48,10 @@ def run_xor_feedforward_network(is_agent_mode_enabled = False):
                 learning_rate = 0.1,
                 is_agent_mode_enabled = is_agent_mode_enabled
         )
-        model.set_data(X_train, y_train, 1000, "xor")
+        model.set_data(X_train, y_train, 50, "xor")
         model.start()
         interface.run()
+        model.join()
         test_xor_network(model, X_train, y_train)
 
 
@@ -74,7 +75,7 @@ def test_xor_network(model, X_test, y_test):
                 errors += abs(res - y_test[i])
 
         accuracy = 1 - (errors / len(y_test))
-        print("Accuracy is {}".format(accuracy))
+        print("Accuracy is {}".format(accuracy) + "\n")
 
 
 def run_cnn(learning_rate, batch_size):

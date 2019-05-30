@@ -23,6 +23,11 @@ class HiddenLayer:
             self.neurons.append(Neuron(input_shape, activation_function))
 
 
+    def get_shape(self):
+        if not self.is_agent_mode_enabled:
+            return self.weights.shape[0] 
+
+
     def get_n_parameters(self):
         if self.is_agent_mode_enabled:
             return self.neurons[0].get_n_parameters() * len(self.neurons)

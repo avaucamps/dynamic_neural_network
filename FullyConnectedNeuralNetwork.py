@@ -5,6 +5,7 @@ from layers.HiddenLayer import HiddenLayer
 from layers.OutputLayer import OutputLayer
 from tqdm import tqdm
 from GUI.Interface import Interface
+from NNArchitectureSeeker import NNArchitectureSeeker
 from threading import Thread
 
 
@@ -24,6 +25,7 @@ class FullyConnectedNeuralNetwork(Thread):
         Thread.__init__(self)
         self.queue = queue
         self._build_model(input_shape, hidden_shape, output_shape, learning_rate, is_agent_mode_enabled)
+        self.architecture_seeker = NNArchitectureSeeker()
 
 
     def set_data(self, inputs, outputs, n_epochs, network_to_run):
@@ -56,28 +58,24 @@ class FullyConnectedNeuralNetwork(Thread):
 
 
     def _train_xor(self):
-        a,b,c = 1,2,3
+        self.queue.put(self._get_hidden_shape())
         for i in range(self.n_epochs):
             print("Epoch " + str(i))
-            self.queue.put([a,b,c])
-            if a < 9:
-                a+=1
-            if b < 9:
-                b+=1
-            if c < 9:
-                c+=1
             for i in tqdm(range(self.inputs.shape[0])):
                 forward_pass_output = self._execute_forward_propagation(self.inputs[i].reshape([2,1]))
                 error = mean_squared_error_derivative(forward_pass_output, self.outputs[i])
                 self._execute_backpropagation(error)
+            
+            self.queue.put(self.architecture_seeker.search(self._get_hidden_shape()))
+        self.queue.put("Done")
 
 
-    def _train_mnist(self, inputs, outputs):
+    def _train_mnist(self):
         for i in range(self.n_epochs):
             print("Epoch " + str(i))
-            for i in tqdm(range(inputs.shape[0])):
-                input_sample = inputs[i].reshape([inputs[i].shape[0], 1])
-                expected_output = outputs[i].reshape([outputs[i].shape[0], 1])
+            for i in tqdm(range(self.inputs.shape[0])):
+                input_sample = self.inputs[i].reshape([self.inputs[i].shape[0], 1])
+                expected_output = self.outputs[i].reshape([self.outputs[i].shape[0], 1])
                 forward_pass_output = self._execute_forward_propagation(input_sample)
                 error = mean_squared_error_derivative(forward_pass_output, expected_output)
                 self._execute_backpropagation(error)
@@ -103,7 +101,15 @@ class FullyConnectedNeuralNetwork(Thread):
         self.hidden_layers.reverse()
 
 
-    def _test(self, input_vector):
+    def _get_hidden_shape(self):
+        hidden_shape = []
+        for i in range(len(self.hidden_layers)):
+            hidden_shape.append(self.hidden_layers[i].get_shape())
+        
+        return hidden_shape
+
+
+    def test(self, input_vector):
         return self._execute_forward_propagation(input_vector)
 
 
