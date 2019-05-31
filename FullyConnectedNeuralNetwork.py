@@ -7,6 +7,8 @@ from tqdm import tqdm
 from GUI.Interface import Interface
 from NNArchitectureSeeker import NNArchitectureSeeker
 from threading import Thread
+from DisplayData import DisplayData
+import time
 
 
 class FullyConnectedNeuralNetwork(Thread):
@@ -25,7 +27,6 @@ class FullyConnectedNeuralNetwork(Thread):
         Thread.__init__(self)
         self.queue = queue
         self._build_model(input_shape, hidden_shape, output_shape, learning_rate, is_agent_mode_enabled)
-        self.architecture_seeker = NNArchitectureSeeker()
 
 
     def set_data(self, inputs, outputs, n_epochs, network_to_run):
@@ -45,7 +46,7 @@ class FullyConnectedNeuralNetwork(Thread):
 
 
     def _build_model(self, input_shape, hidden_shape, output_shape, learning_rate, is_agent_mode_enabled):
-        self.input_layer = InputLayer()
+        self.input_layer = InputLayer(input_shape)
         self.hidden_layers = []
 
         last_output_shape = input_shape
@@ -55,6 +56,7 @@ class FullyConnectedNeuralNetwork(Thread):
 
         last_layer_output_shape = self.hidden_layers[-1].get_output_shape()
         self.output_layer = OutputLayer(output_shape, last_layer_output_shape, sigmoid, learning_rate)
+        self.architecture_seeker = NNArchitectureSeeker(self.hidden_layers, self.input_layer, self.output_layer)
 
 
     def _train_xor(self):
@@ -66,7 +68,9 @@ class FullyConnectedNeuralNetwork(Thread):
                 error = mean_squared_error_derivative(forward_pass_output, self.outputs[i])
                 self._execute_backpropagation(error)
             
-            self.queue.put(self.architecture_seeker.search(self._get_hidden_shape()))
+            self.hidden_layers, (attractors, particles) = self.architecture_seeker.update_network()
+            self.queue.put(DisplayData(self._get_hidden_shape(), attractors, particles))
+            time.sleep(0.05)
         self.queue.put("Done")
 
 
@@ -104,7 +108,7 @@ class FullyConnectedNeuralNetwork(Thread):
     def _get_hidden_shape(self):
         hidden_shape = []
         for i in range(len(self.hidden_layers)):
-            hidden_shape.append(self.hidden_layers[i].get_shape())
+            hidden_shape.append(self.hidden_layers[i].get_output_shape())
         
         return hidden_shape
 

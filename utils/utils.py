@@ -1,6 +1,7 @@
 import matplotlib.pyplot as plt
 import numpy as np
 from scipy.stats import truncnorm
+import math
 
 
 def truncated_normal(mean=0, sd=1, low=0, upp=10):
@@ -49,3 +50,19 @@ def index_nan_argmax(array):
     idx = np.nanargmax(array)
     idxs = np.unravel_index(idx, array.shape)
     return idxs 
+
+
+def distance(x1, y1, x2, y2):
+    x = x1 - x2
+    y = y1 - y2
+    return math.sqrt(math.pow(x,2) + math.pow(y, 2))
+
+
+
+def distance_squared(x1, y1, x2, y2):
+    return distance(x1, y1, x2, y2)
+
+    
+def force(m1, m2, d_squared):
+    G = 50
+    return G * ((m1 * m2) / (d_squared))

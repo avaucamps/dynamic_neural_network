@@ -3,6 +3,7 @@ import types
 from queue import Queue
 from .StdRepresentationHelper import StdRepresentationHelper
 from .AgentRepresentationHelper import AgentRepresentationHelper
+from DisplayData import DisplayData
 
 
 class Interface():
@@ -12,7 +13,7 @@ class Interface():
         self.window.wm_title("Neural network dynamic organisation")
         self._setup_canvas()
         self.std_representation_helper = StdRepresentationHelper(self.canvas)
-        self.agent_representation_helper = AgentRepresentationHelper(self.canvas)
+        self.agent_representation_helper = AgentRepresentationHelper(self.canvas, self.middle, 0, self.width-self.middle, self.height)
 
 
     def run(self):
@@ -23,6 +24,7 @@ class Interface():
     def _setup_canvas(self):
         self.width = 1500
         self.height = 800
+        self.middle = 850
         self.canvas = tk.Canvas(self.window, width=self.width, height=self.height, borderwidth=0, highlightthickness=0, bg="white")
         self.canvas.grid()
 
@@ -33,7 +35,7 @@ class Interface():
         self.canvas.create_text(185, 20, font=font, text="Neural network standard representation")
         self.canvas.create_text(1035, 20, font=font, text="Neural network agent representation")
         self.canvas.create_text(910, 70, font="Arial 11", text="Layer: ")
-        self.canvas.create_rectangle(950, 63, 964, 77)
+        self.canvas.create_rectangle(950, 65, 960, 70)
         self.canvas.create_text(915, 110, font="Arial 11", text="Neuron: ")
         self.canvas.create_oval(955, 105, 965, 115, fill="#BBB")
 
@@ -45,21 +47,16 @@ class Interface():
         )
 
 
-    def _draw_network_agent_representation(self, hidden_shape):
-        x_center = 1300
-        self.agent_representation_helper.draw_representation(
-            hidden_shape=hidden_shape, 
-            x_center=x_center, 
-            height=self.height
-        )
+    def _draw_network_agent_representation(self, attractors, particles):
+        self.agent_representation_helper.draw_physics_modelisation(attractors, particles)
 
 
     def _update(self):
         message = self.queue.get()
         if message:
-            if isinstance(message, list):
-                self._draw_network_std_representation(message)
-                self._draw_network_agent_representation(message)
+            if isinstance(message, DisplayData):
+                self._draw_network_std_representation(message.hidden_shape)
+                self._draw_network_agent_representation(message.attractors, message.particles)
             elif isinstance(message, str) and message == "Done":
                 return
 

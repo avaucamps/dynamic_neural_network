@@ -6,26 +6,16 @@ class HiddenLayer:
     def __init__(self, n_neurons, input_shape, activation_function, learning_rate, is_agent_mode_enabled = False):
         self.activation_function = activation_function
         self.is_agent_mode_enabled = is_agent_mode_enabled
+        self.input_shape = input_shape
         self.output = np.empty([n_neurons, 1])
 
         if self.is_agent_mode_enabled:
             self.setup_neurons(n_neurons, input_shape, activation_function)
             self.weights = np.empty([n_neurons, input_shape])
         else:
-            self.setup_weights(n_neurons, input_shape)
+            self.weights = self.get_init_weights(n_neurons, input_shape)
         
         self.learning_rate = learning_rate
-
-
-    def setup_neurons(self, n_neurons, input_shape, activation_function):
-        self.neurons = []
-        for _ in range(n_neurons):
-            self.neurons.append(Neuron(input_shape, activation_function))
-
-
-    def get_shape(self):
-        if not self.is_agent_mode_enabled:
-            return self.weights.shape[0] 
 
 
     def get_n_parameters(self):
@@ -36,16 +26,95 @@ class HiddenLayer:
 
 
     def get_output_shape(self):
-        return self.output.shape[0]
+        return self.weights.shape[0]
+
+
+    def get_output(self):
+        return self.output
+
+
+    def add_neuron(self):
+        if self.is_agent_mode_enabled: return
+        new_neuron = self.get_init_weights(1, self.input_shape)
+        self.weights = np.concatenate((self.weights, new_neuron), axis=0)
+
+
+    def add_input(self):
+        if self.is_agent_mode_enabled: return
+        new_input = self.get_init_weights(self.get_output_shape(), 1)
+        self.weights = np.concatenate((self.weights, new_input), axis=1)
+        self.input_shape = self.weights.shape[1]
+
+
+    def remove_neuron(self, index):
+        if self.is_agent_mode_enabled: return
+        if index > self.get_output_shape(): return
+
+        new_weights_1 = self.weights[:index-1, :]
+        new_weights_2 = self.weights[index:, :]
+        self.weights = np.concatenate((new_weights_1, new_weights_2), axis=0)
 
     
-    def setup_weights(self, n_neurons, input_shape):
+    def remove_inputs(self, index):
+        if self.is_agent_mode_enabled: return
+        if index > self.weights.shape[1]: return
+
+        new_weights_1 = self.weights[:, :index-1]
+        new_weights_2 = self.weights[:, index:]
+        self.weights = np.concatenate((new_weights_1, new_weights_2), axis=1)
+        self.input_shape = self.weights.shape[1]
+
+
+    #Research subject: study neurons. How to move them ? Do we conserve the weights ?
+    def update_n_neurons(self, n_neurons):
+        if self.is_agent_mode_enabled: return
+        if n_neurons == self.get_output_shape(): return
+
+        new_weights = np.empty([n_neurons, self.input_shape])
+        if n_neurons < self.get_output_shape():
+            new_weights = self.weights[:n_neurons, :]
+        else:
+            new_weights[:self.get_output_shape(), :] = self.weights
+            new_weights[self.get_output_shape():, :] = self.get_init_weights(
+                n_neurons = n_neurons - self.get_output_shape(),
+                input_shape = self.input_shape
+            )
+
+        self.weights = new_weights
+
+
+    def get_shape(self):
+        return self.weights.shape
+
+
+    def update_input_shape(self, input_shape):
+        if self.is_agent_mode_enabled: return
+        if self.input_shape == input_shape: return
+        
+        new_weights = np.empty([self.get_output_shape(), input_shape])
+        if input_shape < self.input_shape:
+            new_weights = self.weights[:, :input_shape]
+        else:
+            new_weights[:, :self.input_shape] = self.weights
+            new_weights[:, self.input_shape:] = self.get_init_weights(self.get_output_shape(), input_shape - self.input_shape)
+
+        self.input_shape = input_shape
+        self.weights = new_weights
+
+
+    def setup_neurons(self, n_neurons, input_shape, activation_function):
+        self.neurons = []
+        for _ in range(n_neurons):
+            self.neurons.append(Neuron(input_shape, activation_function))
+
+    
+    def get_init_weights(self, n_neurons, input_shape):
         rad = 1 / np.sqrt(input_shape)
         X = truncated_normal(mean=0, 
                              sd=1, 
                              low=-rad, 
                              upp=rad)
-        self.weights = np.array(X.rvs((n_neurons, input_shape)))
+        return np.array(X.rvs((n_neurons, input_shape)))
 
     
     def execute_forward_pass(self, inputs):
@@ -72,7 +141,3 @@ class HiddenLayer:
             self.weights -= self.learning_rate * gradient
         
         return self.weights, current_layer_error
-
-    
-    def get_output(self):
-        return self.output

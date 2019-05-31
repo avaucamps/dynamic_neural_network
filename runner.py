@@ -6,6 +6,7 @@ from CNN import CNN
 from tqdm import tqdm
 from GUI.Interface import Interface
 from queue import Queue
+from NNArchitectureSeeker import NNArchitectureSeeker
 
 np.random.seed(0)
 
@@ -43,12 +44,12 @@ def run_xor_feedforward_network(is_agent_mode_enabled = False):
         model = FullyConnectedNeuralNetwork(
                 queue = queue,
                 input_shape = 2, 
-                hidden_shape = [1,2,3,4,5,6,7,9], 
+                hidden_shape = [2,2], 
                 output_shape = 1, 
                 learning_rate = 0.1,
                 is_agent_mode_enabled = is_agent_mode_enabled
         )
-        model.set_data(X_train, y_train, 50, "xor")
+        model.set_data(X_train, y_train, 1000, "xor")
         model.start()
         interface.run()
         model.join()
