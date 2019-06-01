@@ -87,10 +87,14 @@ class HiddenLayer:
         elif index == 0:
             if self.weights.shape[1] == 1:
                 self.weights = None
+                self.input_shape = 0
+                return
             else:
                 self.weights = self.weights[:, 1:]
         elif index == self.weights.shape[1]-1:
             self.weights = self.weights[:, :index]
+            
+        self.input_shape = self.weights.shape[1]
 
 
     #Research subject: study neurons. How to move them ? Do we conserve the weights ?
@@ -118,7 +122,7 @@ class HiddenLayer:
     def update_input_shape(self, input_shape):
         if self.is_agent_mode_enabled: return
         if self.input_shape == input_shape: return
-        
+
         new_weights = np.empty([self.get_output_shape(), input_shape])
         if input_shape < self.input_shape:
             new_weights = self.weights[:, :input_shape]

@@ -5,8 +5,10 @@ class Attractor:
     def __init__(self, x, y, hidden_layer):
         self.position = Vector(x, y)
         self.hidden_layer = hidden_layer
+        self.is_alive = True
         self.update()
 
     
     def update(self):
-        self.mass = self.hidden_layer.weights.sum()
+        if self.is_alive:    
+            self.mass = self.hidden_layer.weights.sum()

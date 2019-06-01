@@ -56,7 +56,7 @@ class StdRepresentationHelper:
         y2 = 625
         x1 = x1 + 10
         x2 = x2 - 10
-        self.canvas.create_rectangle(x1, y1, x2, y2, tags=self.removable_tag)
+        self.canvas.create_rectangle(x1, y1, x2, y2)
 
         #draw the hidden layers
         #divide the width of the container by the number of layers

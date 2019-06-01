@@ -22,22 +22,22 @@ class Interface():
 
 
     def _setup_canvas(self):
-        self.width = 1500
-        self.height = 800
-        self.middle = 850
+        self.width = 1920
+        self.height = 1080
+        self.middle = (1920/2)
         self.canvas = tk.Canvas(self.window, width=self.width, height=self.height, borderwidth=0, highlightthickness=0, bg="white")
         self.canvas.grid()
 
-        self.std_representation_width = 850
+        self.std_representation_width = self.width / 2
         self.agent_representation_width = self.width - self.std_representation_width
         self.canvas.create_line(self.std_representation_width, 0, self.std_representation_width, self.height)
         font = "Arial 13 bold underline"
         self.canvas.create_text(185, 20, font=font, text="Neural network standard representation")
-        self.canvas.create_text(1035, 20, font=font, text="Neural network agent representation")
-        self.canvas.create_text(910, 70, font="Arial 11", text="Layer: ")
-        self.canvas.create_rectangle(950, 65, 960, 70)
-        self.canvas.create_text(915, 110, font="Arial 11", text="Neuron: ")
-        self.canvas.create_oval(955, 105, 965, 115, fill="#BBB")
+        self.canvas.create_text(1145, 20, font=font, text="Neural network agent representation")
+        self.canvas.create_text(1000, 70, font="Arial 11", text="Layer: ")
+        self.canvas.create_rectangle(1025, 65, 1035, 75)
+        self.canvas.create_text(995, 110, font="Arial 11", text="Neuron: ")
+        self.canvas.create_oval(1025, 105, 1035, 115, fill="#BBB")
 
 
     def _draw_network_std_representation(self, hidden_shape):

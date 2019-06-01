@@ -25,6 +25,8 @@ class OutputLayer:
 
     
     def get_output_shape(self):
+        if self.weights is None:
+            return 0
         return self.weights.shape[0]
 
 
@@ -44,10 +46,14 @@ class OutputLayer:
         elif index == 0:
             if self.weights.shape[1] == 1:
                 self.weights = None
+                self.input_shape = 0
+                return
             else:
                 self.weights = self.weights[:, 1:]
         elif index == self.weights.shape[1]-1:
             self.weights = self.weights[:, :index]
+
+        self.input_shape = self.weights.shape[1]
 
 
     def update_input_shape(self, input_shape):

@@ -11,7 +11,7 @@ class AgentRepresentationHelper:
         self.removable_tag = "removable"
         self.scale_x = width / PHYSICS_WORLD_SIZE[0]
         self.scale_y = height / PHYSICS_WORLD_SIZE[1]
-        self.x = x + 450
+        self.x = x + (x/2)
         self.y = y
 
 
