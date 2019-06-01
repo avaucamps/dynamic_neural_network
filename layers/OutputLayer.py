@@ -37,10 +37,17 @@ class OutputLayer:
     def remove_inputs(self, index):
         if index > self.weights.shape[1]: return
 
-        new_weights_1 = self.weights[:, :index-1]
-        new_weights_2 = self.weights[:, index:]
-        self.weights = np.concatenate((new_weights_1, new_weights_2), axis=1)
-        self.input_shape = self.weights.shape[1]
+        if index > 0 and index < self.weights.shape[1]-1:
+            new_weights_1 = self.weights[:, :index]
+            new_weights_2 = self.weights[:, index+1:]
+            self.weights = np.concatenate((new_weights_1, new_weights_2), axis=1)
+        elif index == 0:
+            if self.weights.shape[1] == 1:
+                self.weights = None
+            else:
+                self.weights = self.weights[:, 1:]
+        elif index == self.weights.shape[1]-1:
+            self.weights = self.weights[:, :index]
 
 
     def update_input_shape(self, input_shape):

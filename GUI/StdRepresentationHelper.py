@@ -48,6 +48,7 @@ class StdRepresentationHelper:
 
     def _draw_hidden_layers(self, hidden_shape, container_width, x1, x2):
         #text
+        if len(hidden_shape) == 0: return
         self.canvas.create_text(container_width / 2, 125, text="Hidden layers")
 
         #draw hidden layers container
@@ -89,6 +90,7 @@ class StdRepresentationHelper:
             #divide the height of the layer by the number of neurons
             #gives space for each neuron
             #draw layer in the center of that space
+            if n_neurons == 0: return
             layer_container_width = layer_x2 - layer_x1
             neurons_container_height = layer_y2 - layer_y1
             neuron_container_height = int(neurons_container_height / n_neurons)

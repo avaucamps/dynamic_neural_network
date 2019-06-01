@@ -44,7 +44,7 @@ def run_xor_feedforward_network(is_agent_mode_enabled = False):
         model = FullyConnectedNeuralNetwork(
                 queue = queue,
                 input_shape = 2, 
-                hidden_shape = [2,2], 
+                hidden_shape = [4,4,8], 
                 output_shape = 1, 
                 learning_rate = 0.1,
                 is_agent_mode_enabled = is_agent_mode_enabled
@@ -53,7 +53,9 @@ def run_xor_feedforward_network(is_agent_mode_enabled = False):
         model.start()
         interface.run()
         model.join()
-        test_xor_network(model, X_train, y_train)
+        
+        if len(model.hidden_layers) > 0:
+                test_xor_network(model, X_train, y_train)
 
 
 def test_mnist_network(model, X_test, y_test):

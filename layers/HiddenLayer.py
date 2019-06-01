@@ -1,4 +1,9 @@
 import numpy as np
+
+# a = np.random.randn(2,1)
+# print(a)
+# print(a[0:,:])
+
 from .Neuron import Neuron
 from utils.utils import truncated_normal
 
@@ -26,6 +31,8 @@ class HiddenLayer:
 
 
     def get_output_shape(self):
+        if self.weights is None:
+            return 0
         return self.weights.shape[0]
 
 
@@ -36,13 +43,19 @@ class HiddenLayer:
     def add_neuron(self):
         if self.is_agent_mode_enabled: return
         new_neuron = self.get_init_weights(1, self.input_shape)
-        self.weights = np.concatenate((self.weights, new_neuron), axis=0)
+        if self.weights is None:
+            self.weights = new_neuron
+        else:
+            self.weights = np.concatenate((self.weights, new_neuron), axis=0)
 
 
     def add_input(self):
         if self.is_agent_mode_enabled: return
         new_input = self.get_init_weights(self.get_output_shape(), 1)
-        self.weights = np.concatenate((self.weights, new_input), axis=1)
+        if self.weights is None:
+            self.weights = new_input
+        else:
+            self.weights = np.concatenate((self.weights, new_input), axis=1)
         self.input_shape = self.weights.shape[1]
 
 
@@ -50,19 +63,34 @@ class HiddenLayer:
         if self.is_agent_mode_enabled: return
         if index > self.get_output_shape(): return
 
-        new_weights_1 = self.weights[:index-1, :]
-        new_weights_2 = self.weights[index:, :]
-        self.weights = np.concatenate((new_weights_1, new_weights_2), axis=0)
+        if index > 0 and index < self.weights.shape[0]-1:
+            new_weights_1 = self.weights[:index, :]
+            new_weights_2 = self.weights[index+1:, :]
+            self.weights = np.concatenate((new_weights_1, new_weights_2), axis=0)
+        elif index == 0:
+            if self.weights.shape[0] == 1:
+                self.weights = None
+            else:
+                self.weights = self.weights[1:, :]
+        elif index == self.weights.shape[0]-1:
+            self.weights = self.weights[:index, :]
 
     
     def remove_inputs(self, index):
         if self.is_agent_mode_enabled: return
         if index > self.weights.shape[1]: return
 
-        new_weights_1 = self.weights[:, :index-1]
-        new_weights_2 = self.weights[:, index:]
-        self.weights = np.concatenate((new_weights_1, new_weights_2), axis=1)
-        self.input_shape = self.weights.shape[1]
+        if index > 0 and index < self.weights.shape[1]-1:
+            new_weights_1 = self.weights[:, :index]
+            new_weights_2 = self.weights[:, index+1:]
+            self.weights = np.concatenate((new_weights_1, new_weights_2), axis=1)
+        elif index == 0:
+            if self.weights.shape[1] == 1:
+                self.weights = None
+            else:
+                self.weights = self.weights[:, 1:]
+        elif index == self.weights.shape[1]-1:
+            self.weights = self.weights[:, :index]
 
 
     #Research subject: study neurons. How to move them ? Do we conserve the weights ?

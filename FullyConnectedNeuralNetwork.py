@@ -69,6 +69,13 @@ class FullyConnectedNeuralNetwork(Thread):
                 self._execute_backpropagation(error)
             
             self.hidden_layers, (attractors, particles) = self.architecture_seeker.update_network()
+            if len(self.hidden_layers) == 0:
+                print("Failed to find optimal network.")
+                self.queue.put(DisplayData([], [], []))
+                time.sleep(0.05)
+                self.queue.put("Done")
+                return
+                
             self.queue.put(DisplayData(self._get_hidden_shape(), attractors, particles))
             time.sleep(0.05)
         self.queue.put("Done")

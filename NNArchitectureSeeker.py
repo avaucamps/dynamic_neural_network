@@ -45,22 +45,34 @@ class NNArchitectureSeeker:
 
     def update_network(self):
         max_distance_part_to_attr = PHYSICS_WORLD_SIZE[1] / len(self.hidden_layers) 
-        attractors = []
-        particles = []
-        layers_to_remove = []
 
         for i in range(len(self.hidden_layers)):
             attractor = self._get_attractor(self.hidden_layers[i])
             if attractor == None:
                 continue
 
-            particles += self._update_neurons(self.hidden_layers[i], attractor, max_distance_part_to_attr)
-            layers_to_remove, attractors = self._update_layer(self.hidden_layers[i], attractor, layers_to_remove, attractors)
+            self._update_neurons(self.hidden_layers[i], attractor, max_distance_part_to_attr)
+            if self.output_layer.weights is None:
+                return [], ([], [])
+            self._update_layer(self.hidden_layers[i], attractor)
 
-        self.attractors = attractors
+        hidden_layers = []
+        for layer in self.hidden_layers:
+            if layer.weights is not None and layer.weights.size > 0:
+                hidden_layers.append(layer)
+        self.hidden_layers = hidden_layers
+
+        particles = []
+        for particle in self.particles:
+            if particle.hidden_layer in self.hidden_layers:
+                particles.append(particle)
         self.particles = particles
-        for layer in layers_to_remove:
-            self.hidden_layers.remove(layer)
+
+        attractors = []
+        for attractor in self.attractors:
+            if attractor.hidden_layer in self.hidden_layers:
+                attractors.append(attractor)
+        self.attractors = attractors
 
         self._update_elements()
         self._apply_forces()
@@ -77,33 +89,26 @@ class NNArchitectureSeeker:
 
 
     def _update_neurons(self, layer, attractor, max_dist):
-        particles = []
         for i in range(len(self.particles)):
+            if self.output_layer.weights is None:
+                return
+            if layer.weights is None:
+                return
+
             if self.particles[i].hidden_layer == layer:
                 x1, y1 = self.particles[i].position.x, self.particles[i].position.y
                 x2, y2 = attractor.position.x, attractor.position.y
                 if distance(x1, y1, x2, y2) > max_dist:
                     self._remove_particle(self.particles[i], layer)
-                    if self._add_particle_to_closest_layer(self.particles[i], max_dist):
-                        particles.append(self.particles[i])
-                else:
-                    particles.append(self.particles[i])
-
-        return particles
+                    self._add_particle_to_closest_layer(self.particles[i], max_dist)
 
 
-    def _update_layer(self, layer, attractor, layers_to_remove, attractors):
-        if layer.get_output_shape() <= 0:
-            layers_to_remove.append(layer)
+    def _update_layer(self, layer, attractor):
+        if layer.weights is None or layer.weights.size == 0:
             previous_layer = self._get_previous_layer(layer)
             next_layer = self._get_next_layer(layer)
 
-            #update next layer inputs
             next_layer.update_input_shape(previous_layer.get_output_shape())
-        else:
-            attractors.append(attractor)
-
-        return layers_to_remove, attractors
 
 
     def _get_previous_layer(self, layer):
@@ -111,7 +116,14 @@ class NNArchitectureSeeker:
         if layer_index == 0:
             return self.input_layer
         else:
-            return self.hidden_layers[layer_index - 1]
+            previous_layer = self.hidden_layers[layer_index - 1]
+            while previous_layer.weights is None:
+                layer_index -= 1
+                previous_layer = self.hidden_layers[layer_index - 1]
+                if layer_index == 0:
+                    return self.input_layer
+
+            return previous_layer
 
 
     def _get_next_layer(self, layer):
@@ -119,7 +131,16 @@ class NNArchitectureSeeker:
         if layer_index == len(self.hidden_layers) - 1:
             return self.output_layer
         else:
-            return self.hidden_layers[layer_index + 1]
+            next_layer = self.hidden_layers[layer_index + 1]
+            while next_layer.weights is None:
+                layer_index += 1
+                if layer_index == len(self.hidden_layers) - 1:
+                    return self.output_layer
+                else:
+                    next_layer = self.hidden_layers[layer_index + 1]
+                
+            
+            return next_layer
 
 
     def _remove_particle(self, particle, layer):
@@ -133,10 +154,10 @@ class NNArchitectureSeeker:
         else:
             self.hidden_layers[layer_index+1].remove_inputs(particle.neuron_index)
         
-        self._decrement_neuron_indexes(layer, particle.neuron_index)
+        self._decrement_neurons_index(layer, particle.neuron_index)
 
     
-    def _decrement_neuron_indexes(self, layer, start_index):
+    def _decrement_neurons_index(self, layer, start_index):
         for particle in self.particles:
             if particle.hidden_layer == layer:
                 if particle.neuron_index > start_index:
