@@ -4,6 +4,7 @@ from utils.utils import truncated_normal
 class OutputLayer:
     def __init__(self, n_neurons, input_shape, activation_function, learning_rate):
         self.activation_function = activation_function
+        self.n_neurons = n_neurons
         self.input_shape = input_shape
         self.setup_weights(n_neurons, input_shape)
         self.learning_rate = learning_rate
@@ -59,12 +60,12 @@ class OutputLayer:
     def update_input_shape(self, input_shape):
         if self.input_shape == input_shape: return
         
-        new_weights = np.empty([self.get_output_shape(), input_shape])
+        new_weights = np.empty([self.n_neurons, input_shape])
         if input_shape < self.input_shape:
             new_weights = self.weights[:, :input_shape]
         else:
             new_weights[:, :self.input_shape] = self.weights
-            new_weights[:, self.input_shape:] = self.get_init_weights(self.get_output_shape(), input_shape - self.input_shape)
+            new_weights[:, self.input_shape:] = self.get_init_weights(self.n_neurons, input_shape - self.input_shape)
 
         self.input_shape = input_shape
         self.weights = new_weights

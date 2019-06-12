@@ -60,15 +60,36 @@ class FullyConnectedNeuralNetwork(Thread):
 
 
     def _train_xor(self):
+        hidden_errors = np.zeros((len(self.hidden_layers), 2))
+        hidden_errors[:, 1] = np.full([len(self.hidden_layers), 1], 100000)[:, 0]
+        errors_backprop = np.zeros((len(self.hidden_layers), 1))
+
         self.queue.put(self._get_hidden_shape())
+        
         for i in range(self.n_epochs):
             print("Epoch " + str(i))
             for i in tqdm(range(self.inputs.shape[0])):
                 forward_pass_output = self._execute_forward_propagation(self.inputs[i].reshape([2,1]))
                 error = mean_squared_error_derivative(forward_pass_output, self.outputs[i])
-                self._execute_backpropagation(error)
+                errors_backprop = np.add(errors_backprop, self._execute_backpropagation(error))
             
-            self.hidden_layers, (attractors, particles) = self.architecture_seeker.update_network()
+            errors_backprop = np.divide(errors_backprop, self.inputs.shape[0])
+            hidden_errors[:, 0] = hidden_errors[:, 1]
+            hidden_errors[:, 1] = errors_backprop[:, 0]
+            should_add_neuron = hidden_errors[:, 0] < hidden_errors[:, 1]   
+            
+            self.hidden_layers, (attractors, particles) = self.architecture_seeker.update_network(should_add_neuron)
+
+            #update size errors
+            new_hidden_errors = np.full((len(self.hidden_layers), 2), 100000)
+            bound = min(hidden_errors.shape[0], len(self.hidden_layers))
+            if new_hidden_errors.shape[0] > hidden_errors.shape[0]:
+                new_hidden_errors[:bound, :] = hidden_errors
+            else:
+                new_hidden_errors = hidden_errors[:bound, :]
+            hidden_errors = new_hidden_errors
+            errors_backprop = np.zeros((len(self.hidden_layers), 1))
+
             if len(self.hidden_layers) == 0:
                 print("Failed to find optimal network.")
                 self.queue.put(DisplayData([], [], []))
@@ -106,10 +127,13 @@ class FullyConnectedNeuralNetwork(Thread):
         last_hidden_output = self.hidden_layers[-1].get_output()
         next_layer_weights = self.output_layer.execute_backward_pass(error, last_hidden_output)
         self.hidden_layers.reverse()
-        for layer in self.hidden_layers:
-            next_layer_weights, error = layer.execute_backward_pass(error, next_layer_weights)
+        hidden_errors = np.zeros((len(self.hidden_layers), 1))
+        for i in range(len(self.hidden_layers)):
+            next_layer_weights, error = self.hidden_layers[i].execute_backward_pass(error, next_layer_weights)
+            hidden_errors[i, 0] = np.sum(error)
         
         self.hidden_layers.reverse()
+        return hidden_errors
 
 
     def _get_hidden_shape(self):
