@@ -56,7 +56,7 @@ class NNArchitectureSeeker:
                 continue
 
             self._update_neurons(self.hidden_layers[i], attractor)
-            if self.output_layer.weights is None:
+            if self.output_layer.get_output_shape() == 0:
                 return [], ([], [])
 
         self._remove_dead_particles()
@@ -67,6 +67,9 @@ class NNArchitectureSeeker:
 
         self._update_elements()
         self._apply_forces()
+
+        if self.output_layer.get_output_shape() == 0:
+            return [], ([], [])
 
         return self.hidden_layers, (self.attractors, self.particles)
 
@@ -91,7 +94,8 @@ class NNArchitectureSeeker:
                 particle.hidden_layer.remove_neuron(particle.neuron_index)
                 self._decrement_neurons_index(particle.hidden_layer, particle.neuron_index)
                 next_layer = self._get_next_layer(particle.hidden_layer)
-                next_layer.remove_inputs(particle.neuron_index)
+                if next_layer.get_output_shape() != 0:
+                    next_layer.remove_inputs(particle.neuron_index)
 
                 self._add_to_closest_layer(particle)
 
@@ -101,7 +105,8 @@ class NNArchitectureSeeker:
             if not self._is_layer_alive(layer):
                 previous_layer = self._get_previous_layer(layer)
                 next_layer = self._get_next_layer(layer)
-                next_layer.update_input_shape(previous_layer.get_output_shape())
+                if next_layer.get_output_shape() != 0:
+                    next_layer.update_input_shape(previous_layer.get_output_shape())
 
                 for particle in self.particles:
                     if particle.hidden_layer == layer:
@@ -199,7 +204,6 @@ class NNArchitectureSeeker:
 
 
     def _add_to_closest_layer(self, particle):
-
         for i in range(len(self.hidden_layers)):
             if not self._is_layer_alive(self.hidden_layers[i]): continue
             attractor = self._get_attractor(self.hidden_layers[i])
@@ -211,16 +215,16 @@ class NNArchitectureSeeker:
 
             if distance(x1, y1, x2, y2) <= self.max_distance_part_to_attr:
                 next_layer = self._get_next_layer(self.hidden_layers[i])
-                if next_layer.get_output_shape != 0: 
+                if next_layer.get_output_shape() != 0: 
                     next_layer.add_input()
                     particle.is_alive = True
                     particle.hidden_layer = self.hidden_layers[i]
+                    particle.neuron_index = self.hidden_layers[i].get_output_shape()
                     self.hidden_layers[i].add_neuron()
                     return
 
 
     def _add_neuron(self, layer_index, attractor):
-        print("ADD NEURON")
         x, y = PHYSICS_WORLD_SIZE
         attractors_distance = (y / len(self.hidden_layers))
         attractors_x = x / 2

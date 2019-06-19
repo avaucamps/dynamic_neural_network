@@ -35,7 +35,7 @@ def run_mnist_feedforward_network(hidden_shape, learning_rate, is_agent_mode_ena
         test_mnist_network(model, X_test, y_test)
 
 
-def run_xor_feedforward_network(is_agent_mode_enabled = False):
+def run_xor_feedforward_network(architecture, is_agent_mode_enabled = False):
         X_train = np.array([[0, 1], [1, 0], [1, 1], [0, 0]])
         y_train = np.array([[1], [1], [0], [0]])
         queue = Queue()
@@ -44,7 +44,7 @@ def run_xor_feedforward_network(is_agent_mode_enabled = False):
         model = FullyConnectedNeuralNetwork(
                 queue = queue,
                 input_shape = 2, 
-                hidden_shape = [2,2], 
+                hidden_shape = architecture, 
                 output_shape = 1, 
                 learning_rate = 0.1,
                 is_agent_mode_enabled = is_agent_mode_enabled

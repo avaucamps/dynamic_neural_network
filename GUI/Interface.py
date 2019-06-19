@@ -58,6 +58,7 @@ class Interface():
                 self._draw_network_std_representation(message.hidden_shape)
                 self._draw_network_agent_representation(message.attractors, message.particles)
             elif isinstance(message, str) and message == "Done":
+                self.window.destroy()
                 return
 
         self.canvas.update()

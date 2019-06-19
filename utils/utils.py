@@ -65,4 +65,4 @@ def distance_squared(x1, y1, x2, y2):
     
 def force(m1, m2, d_squared):
     G = 10
-    return G * (((m1 * m2)**2) / (d_squared))
+    return G * ((m1 * m2) / d_squared)

@@ -9,6 +9,7 @@ from NNArchitectureSeeker import NNArchitectureSeeker
 from threading import Thread
 from DisplayData import DisplayData
 import time
+from GUI.done_popup import show_failure_popup
 
 
 class FullyConnectedNeuralNetwork(Thread):
@@ -92,8 +93,8 @@ class FullyConnectedNeuralNetwork(Thread):
 
             if len(self.hidden_layers) == 0:
                 print("Failed to find optimal network.")
+                show_failure_popup()
                 self.queue.put(DisplayData([], [], []))
-                time.sleep(0.05)
                 self.queue.put("Done")
                 return
                 

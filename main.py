@@ -1,4 +1,5 @@
 from runner import *
+from GUI.net_arch_window import ChoiceWindow
 
 # run_mnist_feedforward_network(
 #         hidden_shape=[512],
@@ -11,4 +12,8 @@ from runner import *
 #         batch_size=50
 # )
 
-run_xor_feedforward_network(False)
+def set_architecture(architecture):
+    run_xor_feedforward_network(architecture, False)
+
+b = ChoiceWindow(set_architecture)
+b.show_architecture_choice()
